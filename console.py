@@ -73,7 +73,7 @@ class HBNBCommand(cmd.Cmd):
                 pline = pline[2].strip()  # pline is now str
                 if pline:
                     # check for *args or **kwargs
-                    if pline[0] is '{' and pline[-1] is'}'\
+                    if pline[0] is '{' and pline[-1] is '}' \
                             and type(eval(pline)) is dict:
                         _args = pline
                     else:
@@ -118,11 +118,43 @@ class HBNBCommand(cmd.Cmd):
         if not args:
             print("** class name missing **")
             return
-        elif args not in HBNBCommand.classes:
+
+        # split arguments into cls name and parameters
+        args_list = args.split(" ")
+        cls_name = args_list[0]  # save class name
+
+        # check if class exists in HBNBCommand classes dict
+        if cls_name not in HBNBCommand.classes:
             print("** class doesn't exist **")
             return
-        new_instance = HBNBCommand.classes[args]()
-        storage.save()
+
+        # pop cls_name from arguments list
+        args_list.pop(0)
+        params_dict = {}  # empty dict to store parameters
+
+        # parse & populate parameters dict
+        for params in args_list:
+            # split the parameters into key and value
+            key, value = params.split("=")
+
+            # handle string values with double quotes
+            if value.startswith('"') and value.endswith('"'):
+                value = value[1:-1].replace('_', ' ').replace('\\"', '"')
+
+            try:  # try converting to int, float, | keep string based on format
+                if '.' in value:
+                    value = float(value)
+                else:
+                    value = int(value)
+            except ValueError:
+                pass  # if fails, keep value as a string
+
+            # add key-value pairs to the params dict
+            params_dict[key] = value
+
+        # create an instance of specified class with parsed parameters
+        new_instance = HBNBCommand.classes[cls_name](**params_dict)
+        storage.save()  # save instance & print its ID
         print(new_instance.id)
         storage.save()
 
@@ -187,7 +219,7 @@ class HBNBCommand(cmd.Cmd):
         key = c_name + "." + c_id
 
         try:
-            del(storage.all()[key])
+            del (storage.all()[key])
             storage.save()
         except KeyError:
             print("** no instance found **")
@@ -319,6 +351,7 @@ class HBNBCommand(cmd.Cmd):
         """ Help information for the update class """
         print("Updates an object with new information")
         print("Usage: update <className> <id> <attName> <attVal>\n")
+
 
 if __name__ == "__main__":
     HBNBCommand().cmdloop()
