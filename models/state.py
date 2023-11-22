@@ -7,7 +7,7 @@ import models
 from models.base_model import BaseModel, Base
 from models.city import City
 
-storage_type = getenv('HBNB_TYPE_STORAGE')
+HBNB_TYPE_STORAGE = getenv('HBNB_TYPE_STORAGE', default='file')
 
 
 class State(BaseModel, Base):
@@ -15,7 +15,7 @@ class State(BaseModel, Base):
     __tablename__ = "states"
 
     # For DBStorage
-    if storage_type == "db":
+    if HBNB_TYPE_STORAGE == "db":
         name = Column("name", String(128), nullable=False)
         cities = relationship("City", cascade="all, delete", backref="state")
     else:
