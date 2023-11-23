@@ -48,12 +48,11 @@ class DBStroage:
         session_factory = sessionmaker(bind=self.__engine,
                                        expire_on_commit=False)
 
-        # Session = scoped_session(session_factory)
-        # self.__session = Session()
-        with scoped_session(session_factory) as Session:
-            self.__session = Session()
+        Session = scoped_session(session_factory)
+        self.__session = Session()
+
         # explicitly close the session
-        # Session.remove()
+        Session.remove()
 
     def delete(self, obj=None):
         """Delete from the current db session"""
