@@ -14,9 +14,11 @@ class State(BaseModel, Base):
     """ State class """
     __tablename__ = "states"
 
+    name = Column("name", String(128), nullable=False)
+
     # For DBStorage
     if HBNB_TYPE_STORAGE == "db":
-        name = Column("name", String(128), nullable=False)
+        # name = Column("name", String(128), nullable=False)
         cities = relationship("City", cascade="all, delete", backref="state")
     else:
         # For FileStorage
