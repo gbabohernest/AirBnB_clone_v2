@@ -2,7 +2,7 @@
 """This module creates a new engine DBStorage"""
 
 from os import getenv
-# import models
+import models
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 from models.amenity import Amenity
@@ -13,16 +13,23 @@ from models.review import Review
 from models.state import State
 from models.user import User
 
-# A dictionary mapping class name to class instances
-classes = {"Amenity": Amenity, "City": City, "Place": Place,
-           "Review": Review, "State": State, "User": User}
-
 
 class DBStroage:
     """Database storage engine"""
 
     __engine = None
     __session = None
+
+    # A dictionary mapping class name to
+    # corresponding class objects/instance(s)
+    classes = {
+        "User": User,
+        "State": State,
+        "City": City,
+        "Amenity": Amenity,
+        "Place": Place,
+        "Review": Review
+    }
 
     def __init__(self):
         """Initialize Database engine and session"""
@@ -80,10 +87,13 @@ class DBStroage:
                 value => object
         """
         obj_dict_all = {}
-        for cls_name, cls_obj in classes.items():
-            if cls is None or cls == cls_name:
-                objects = self.__session.query(cls_obj).all()
-                for obj in objects:
-                    key = "{}.{}".format(obj.__class__.__name__, obj.id)
-                    obj_dict_all[key] = obj
+        cls_query_list = list(self.classes.values() if cls is None else [cls])
+
+        # query the list for cls instance(s)
+        for cls_instance in cls_query_list:
+            instances = self.__session.query(cls_instance).all()
+            for instance in instances:
+                key = "{}.{}".format(instance.__class__.__name__, instance.id)
+                obj_dict_all[key] = instance
+
         return obj_dict_all
