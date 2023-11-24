@@ -60,9 +60,9 @@ class FileStorage:
         """Deletes an obj from __objects if it exists,
            if obj is None, the method does nothing
         """
-        if obj is None:
-            return
-        # generate key using obj cls name & ID
-        key = obj.__class__.__name__ + '.' + obj.id
-        if key in self.__objects:
-            del self.__objects[key]
+        if obj is not None:
+            # generate key using obj cls name & ID
+            key = "{}.{}".format(obj.__class__.__name__, obj.id)
+            if key in self.__objects:
+                del self.__objects[key]
+                self.save()
