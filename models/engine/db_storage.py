@@ -39,11 +39,16 @@ class DBStroage:
         HBNB_MYSQL_DB = getenv('HBNB_MYSQL_DB')
         HBNB_ENV = getenv('HBNB_ENV')
 
-        db_url_string = ("mysql+mysqldb://{}:{}@{}/{}".
-                         format(HBNB_MYSQL_USER, HBNB_MYSQL_PWD,
-                                HBNB_MYSQL_HOST, HBNB_MYSQL_DB))
+    #    db_url_string = ("mysql+mysqldb://{}:{}@{}/{}".
+    #                     format(HBNB_MYSQL_USER, HBNB_MYSQL_PWD,
+    #                            HBNB_MYSQL_HOST, HBNB_MYSQL_DB))
 
-        self.__engine = create_engine(db_url_string, pool_pre_ping=True)
+        db_url = "mysql+mysqldb://{}:{}@{}/{}".format(HBNB_MYSQL_USER,
+                                                      HBNB_MYSQL_PWD,
+                                                      HBNB_MYSQL_HOST,
+                                                      HBNB_MYSQL_DB)
+
+        self.__engine = create_engine(db_url, pool_pre_ping=True)
 
         # DROP all tables if env = 'test'
         if HBNB_ENV == 'test':
