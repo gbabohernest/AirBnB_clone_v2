@@ -39,12 +39,12 @@ class BaseModel:
             kwargs['created_at'] = datetime.strptime(kwargs['created_at'],
                                                      '%Y-%m-%dT%H:%M:%S.%f')
             del kwargs['__class__']
-            # self.__dict__.update(kwargs)
+            self.__dict__.update(kwargs)
 
             # manage kwargs to create instance attributes
-            for key, value in kwargs.items():
-                if not hasattr(self, key):
-                    setattr(self, key, value)
+            # for key, value in kwargs.items():
+            #    if not hasattr(self, key):
+            #        setattr(self, key, value)
 
     def __str__(self):
         """Returns a string representation of the instance"""
