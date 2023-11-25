@@ -46,10 +46,10 @@ class BaseModel:
             #    if not hasattr(self, key):
             #        setattr(self, key, value)
 
-    def __str__(self):
-        """Returns a string representation of the instance"""
-        cls = (str(type(self)).split('.')[-1]).split('\'')[0]
-        return '[{}] ({}) {}'.format(cls, self.id, self.__dict__)
+    # def __str__(self):
+    #    """Returns a string representation of the instance"""
+    #    cls = (str(type(self)).split('.')[-1]).split('\'')[0]
+    #    return '[{}] ({}) {}'.format(cls, self.id, self.__dict__)
 
     def save(self):
         """Updates updated_at with current time when instance is changed"""
@@ -68,8 +68,9 @@ class BaseModel:
         dictionary['updated_at'] = self.updated_at.isoformat()
 
         # remove key _sa_instance_state from dict if it exists
-        if '_sa_instance_state' in dictionary:
-            del dictionary['_sa_instance_state']
+        # if '_sa_instance_state' in dictionary:
+        #    del dictionary['_sa_instance_state']
+        dictionary.pop("_sa_instance_state", None)
 
         return dictionary
 
@@ -79,3 +80,12 @@ class BaseModel:
         """
         from models import storage
         storage.delete(self)
+
+    def __str__(self):
+        """Return the string representation ||
+           pretty print the BaseModel instance.
+        """
+        pretty_dict = self.__dict__.copy()
+        pretty_dict.pop("_sa_instance_state", None)
+        return "[{}] ({}) {}".format(type(self).__name__,
+                                     self.id, pretty_dict)
