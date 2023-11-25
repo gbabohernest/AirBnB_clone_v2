@@ -7,7 +7,7 @@ import models
 from models.base_model import BaseModel, Base
 from models.city import City
 
-HBNB_TYPE_STORAGE = getenv('HBNB_TYPE_STORAGE', default='file')
+HBNB_TYPE_STORAGE = getenv('HBNB_TYPE_STORAGE')
 
 
 class State(BaseModel, Base):
