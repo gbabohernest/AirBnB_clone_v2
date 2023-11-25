@@ -5,9 +5,9 @@ from os import getenv
 import models
 from models.base_model import BaseModel, Base
 from sqlalchemy import Column, String, Integer, Float, ForeignKey
+from sqlalchemy import Table
 from sqlalchemy.orm import relationship
 from models.review import Review
-from models.amenity import Amenity
 
 HBNB_TYPE_STORAGE = getenv('HBNB_TYPE_STORAGE')
 
@@ -38,14 +38,16 @@ class Place(BaseModel, Base):
     price_by_night = Column(Integer, nullable=False, default=0)
     latitude = Column(Float, nullable=True)
     longitude = Column(Float, nullable=True)
+    amenities = relationship("Amenity", secondary=place_amenity,
+                             viewonly=False)
 
     # For DBStorage
     if HBNB_TYPE_STORAGE == "db":
         reviews = relationship("Review", cascade="all, delete",
                                backref="place")
 
-    amenities = relationship("Amenity", secondary=place_amenity,
-                             viewonly=False)
+    #    amenities = relationship("Amenity", secondary=place_amenity,
+    #                             backref='place_amenities', viewonly=False)
 
     else:
         # For FileStorage
@@ -64,6 +66,7 @@ class Place(BaseModel, Base):
             the attribute amenity_ids that contains all Amenity.id
             linked to the Place.
             """
+            from models.amenity import Amenity
 
             return [amenity for amenity in models.storage.all(Amenity).values()
                     if amenity.id in self.amenity_ids]
@@ -74,6 +77,8 @@ class Place(BaseModel, Base):
             Handles append method for adding an Amenity.id to the
             attribute amenity_id.
             """
+            from models.amenity import Amenity
+
             if isinstance(amenity_obj, Amenity):
                 self.amenity_ids.append(amenity_obj.id)
                 # ignore if input is not an amenity object/instance
