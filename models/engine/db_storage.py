@@ -13,6 +13,9 @@ from models.review import Review
 from models.state import State
 from models.user import User
 
+# classes = {"Amenity": Amenity, "City": City,
+#           "Place": Place, "Review": Review, "State": State, "User": User}
+
 
 class DBStroage:
     """Database storage engine"""
@@ -54,6 +57,32 @@ class DBStroage:
         if HBNB_ENV == 'test':
             Base.metadata.drop_all(self.__engine)
 
+    def all(self, cls=None):
+        """Query on the current db session, all objs of a given
+           class name, otherwise query all objs types
+           {User, State, City, Amenity, Place & Review}
+
+        Return: A dictionary:
+                key  => <class-name>.<object-id>
+                value => object
+        """
+        obj_id = {}
+        if cls is None:
+            for cls_name, cls_instance in self.classes.items():
+                class_objects = self.__session.query(cls_instance).all()
+                for row in class_objects:
+                    key = "{}.{}".format(row.__class__.__name__, row.id)
+                    obj_id[key] = row
+        else:
+            cls_instance = self.classes.get(cls)
+            if cls_instance:
+                class_objects = self.__session.query(cls_instance).all()
+                for row in class_objects:
+                    key = "{}.{}".format(row.__class__.__name__, row.id)
+                    obj_id[key] = row
+
+        return obj_id
+
     def reload(self):
         """Create all tables in db & create current db session from engine"""
         Base.metadata.create_all(self.__engine)
@@ -81,24 +110,3 @@ class DBStroage:
         if obj:
             self.__session.add(obj)
             self.save()
-
-    def all(self, cls=None):
-        """Query on the current db session, all objs of a given
-           class name, otherwise query all objs types
-           {User, State, City, Amenity, Place & Review}
-
-        Return: A dictionary:
-                key  => <class-name>.<object-id>
-                value => object
-        """
-        obj_dict_all = {}
-        cls_query_list = list(self.classes.values() if cls is None else [cls])
-
-        # query the list for cls instance(s)
-        for cls_instance in cls_query_list:
-            instances = self.__session.query(cls_instance).all()
-            for instance in instances:
-                key = "{}.{}".format(instance.__class__.__name__, instance.id)
-                obj_dict_all[key] = instance
-
-        return obj_dict_all
