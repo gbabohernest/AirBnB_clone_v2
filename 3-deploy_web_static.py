@@ -79,7 +79,7 @@ def deploy():
     # Call do_pack and store the path of the created archive
     archive_path = do_pack()
 
-    if archive_path is None or not os.path.exists(archive_path):
+    if archive_path is None:
         return False
 
     return do_deploy(archive_path)
