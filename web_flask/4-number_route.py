@@ -47,12 +47,11 @@ def python_route(text='is cool'):
     return 'Python {}'.format(replace_text_with_spaces)
 
 
-@app.route('/number/<n>', strict_slashes=False)
+@app.route('/number/<int:n>', strict_slashes=False)
 def number_route(n):
     """Display n is a number, only if n is an integer"""
 
-    if n.isdigit():
-        return '{} is a number'.format(n)
+    return '{} is a number'.format(n)
 
 
 if __name__ == "__main__":
