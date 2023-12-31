@@ -9,6 +9,7 @@ Display HTML page with State and list of all state objects
 from flask import Flask, render_template
 from models import storage
 from models.state import State
+from operator import attrgetter
 
 app = Flask(__name__)
 
@@ -25,7 +26,7 @@ def states_list():
     and sort them by name and display rendered HTML page
     """
     states = storage.all(State).values()
-    sorted_states = sorted(states, key=lambda state: state.name)
+    sorted_states = sorted(states, key=attrgetter('name'))
     return render_template('7-states_list.html', states=sorted_states)
 
 
