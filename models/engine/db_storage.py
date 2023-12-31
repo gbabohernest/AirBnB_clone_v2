@@ -110,3 +110,7 @@ class DBStroage:
         if obj:
             self.__session.add(obj)
             self.save()
+
+    def close(self):
+        """ calls close() on the private session attribute """
+        self.__session.close()
