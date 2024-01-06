@@ -10,7 +10,7 @@ from models.state import State
 from models.city import City
 from models.amenity import Amenity
 from models.review import Review
-
+import shlex
 
 class HBNBCommand(cmd.Cmd):
     """ Contains the functionality for the HBNB console"""
@@ -18,11 +18,9 @@ class HBNBCommand(cmd.Cmd):
     # determines prompt for interactive/non-interactive modes
     prompt = '(hbnb) ' if sys.__stdin__.isatty() else ''
 
-    classes = {
-               'BaseModel': BaseModel, 'User': User, 'Place': Place,
-               'State': State, 'City': City, 'Amenity': Amenity,
-               'Review': Review
-              }
+    classes = {"Amenity": Amenity, "BaseModel": BaseModel, "City": City,
+               "Place": Place, "Review": Review, "State": State, "User": User}
+
     dot_cmds = ['all', 'count', 'show', 'destroy', 'update']
     types = {
              'number_rooms': int, 'number_bathrooms': int,
@@ -114,47 +112,35 @@ class HBNBCommand(cmd.Cmd):
         pass
 
     def do_create(self, args):
-        """ Create an object of any class"""
-        # split arguments by space to get cls name and parameters
-        args_list = args.split()
-        if not args_list:  # check if cls name is missing
+        """Usage: create <class> <key 1>=<value 2> <key 2>=<value 2> ...
+        Create a new class instance with given keys/values and print its id.
+        """
+
+        if not args:
             print("** class name missing **")
             return
-
-        cls_name = args_list[0]  # save class name
-
-        # check if class exists in HBNBCommand classes dict
-        if cls_name not in HBNBCommand.classes:
+        args_list = args.split()
+        class_name = args_list[0]
+        if class_name not in HBNBCommand.classes:
             print("** class doesn't exist **")
             return
-
-        # create a new instance of the class
-        new_instance = HBNBCommand.classes[cls_name]()
-
-        # process parameter if args are more
-        if len(args_list) > 1:
-            # iterate over each arg, split into key and value pairs
-            for arg in args_list[1:]:
-                key, value = arg.split("=")
-
-                # replace underscores with space in the value
+        params = (args_list[1:])
+        kwargs = {}
+        for param in params:
+            key_value = param.strip().split('=')
+            if len(key_value) == 2:
+                key, value = key_value
                 value = value.replace('_', ' ')
-
-                # trim quotes from key & value
-                key = key.strip("'\"")
-                value = value.strip("'\"")
-
-                # set attr in the instance
-                setattr(new_instance, key, value)
-
-            # save & print id of the new instance after setting attributes
-            new_instance.save()
-            print(new_instance.id)
-
-        else:
-            # save instance if no additional args are provided
-            new_instance.save()
-            print(new_instance.id)
+            if value[0] == '"' and value[-1] == '"':
+                value = value[1:-1].replace('\\"', '"')
+            elif '.' in value:
+                value = float(value)
+            else:
+                value = int(value)
+            kwargs[key] = value
+        new_instance = HBNBCommand.classes[class_name](**kwargs)
+        new_instance.save()
+        print(new_instance.id)
 
     def help_create(self):
         """ Help information for the create method """
